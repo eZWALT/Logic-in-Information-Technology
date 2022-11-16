@@ -37,7 +37,19 @@ symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.- Declare SAT variables to be used
 satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"     (MANDATORY)
+satVariable( active(T,H)):- task(T), integer(H).
+
 % more variables will be needed.... See displaySol!
+eachTaskStartsOnce(MaxHours):- task(T), findall(start(T,H), cumrrado(T,H,MaxHours), Lits) , exactly(1,Lits), fail.
+eachTaskStartsOnce(MaxHours). 
+
+cumrrado(T,H,MAX) :- duration(T,D), Q is H+D, Q < MAX.
+
+activeCoherency(MaxHours):- task(T), duration(T,D), between(1,MaxHours,S), start(T,S), between(S,S+D,H) ,writeClause(-start(T,S), active(T,H)), fail.
+activeCoherency(_).
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,7 +59,7 @@ satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"  
 writeClauses(infinite):- !, maxHour(M), writeClauses(M),!.
 writeClauses(MaxHours):-
     eachTaskStartsOnce(MaxHours),
-    ...
+    activeCoherency(MaxHours),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
