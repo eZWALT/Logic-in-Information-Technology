@@ -1,0 +1,130 @@
+--------------------------------------------------------------------------------------------------
+Logic in Computer Science, January 13th, 2021. Time: 2h30min. No books or lecture notes allowed.
+--------------------------------------------------------------------------------------------------
+Note on evaluation: eval(propositional logic) = max(eval(Problems 1,2,3), eval(partial exam))
+                    eval(first-order logic)   = eval(Problems 4,5,6).
+
+-Insert your answers on the dotted lines ... below, and only there.
+-Do NOT modify the problems or the @nota lines.
+-When finished, upload this file with the same name: exam.txt
+-Use the text symbols:     &     v    -       ->          |=        A       E
+   for                    AND   OR   NOT   IMPLIES   "SATISFIES"  FORALL  EXISTS,  like in:
+   I  |=  p & (q v -r)     (the interpretation I satisfies the formula p & (q v -r)  ).
+   You can write subindices using "_". For example write x_i to denote x-sub-i.
+--------------------------------------------------------------------------------------------------
+
+
+
+Problem 1. (4 points).                                   @n@nota1:
+
+
+1a) Is it true that for any three propositional formulas F, G, H, we have that F & (G v H) is a
+tautology iff (-G & H) v -F is unsatisfiable? Prove it using only the definition of propositional logic.
+
+...
+
+1b) Is it true that for any two propositional formulas F and G, we have that -F v G is a tautology
+if and only if F |= G? Prove it using only the definition of propositional logic.
+
+...
+
+--------------------------------------------------------------------------------------------------
+
+Problem 2. (3 points).                                   @n@nota2:
+For each one of the following statements, indicate if it is true or false for propositional logic.
+Answer T (true) or F (false) on each dotted line ... Give no explanations why.
+Below always F,G,H are formulas, I is an interpretation and S is a set of clauses.
+Note: Wrong ansers subtract 0.4 points. Unanswered questions subtract 0.2 points.
+
+     Answer:
+ 1)    ...    If F is unsatisfiable, then -F |= F.
+ 2)    ...    The closure under resolution Res(S) of a finite set of clauses S is always a DNF.
+ 3)    ...    It is decidable in polynomial time whether a given formula in DNF is satisfiable.
+ 4)    ...    The Tseitin transformation of a formula F is a set of clauses that is logically equivalent to F.
+ 5)    ...    If F is a unsatisfiable, then for every G we have F |= G.
+ 6)    ...    The Tseitin transformation of a formula F always has a number of clauses that is linear in the size of F.
+ 7)    ...    The Tseitin transformation can be used for reducing SAT to 3-SAT.
+ 8)    ...    It is decidable in polynomial time whether a given formula is a tautology.
+ 9)    ...    The closure under resolution Res(S) of a finite set of clauses S is always a finite set of clauses.
+10)    ...    The formula  p v p  is a logical consequence of  (p v r)  &  (-q v r)  &  (q v r). 
+11)    ...    It is decidable in polynomial time whether a given formula in CNF is a tautology.
+12)    ...    Given I and F, it is decidable in linear time whether I |= F.
+13)    ...    There are formulas F and G such that  F |= G  and  F |= -G.
+14)    ...    If  F v G  |=  H  then F & -H is unsatisfiable. 
+15)    ...    The closure under resolution Res(S) always has a number of clauses that is cubic in the size of S.
+16)    ...    If F is a tautology, then for every G we have G |= F.
+
+
+--------------------------------------------------------------------------------------------------
+
+
+Problem 3. (3 points).                                   @n@nota3:
+
+We want to 3-color a given graph with n nodes: assign one of the 3 colors to each
+node such that for each edge (u,v), nodes u and v do not get the same color of the three colors.
+Of course this may be impossible, so we will allow some nodes to remain uncolored: these nodes get no color.
+Now use a SAT solver to compute the 3-coloring with the minimal number of such uncolored nodes.
+Explain very briefly:
+
+3a) The propositional symbols (variables) you use and their meaning (hint: use a special one no_i meaning "node i gets no color")
+
+...
+
+3b) The clauses and constraints you use (no need to explain how the constraint is encoded into clauses)
+
+...
+
+3c) How you optimize by means of different calls to the SAT solver
+
+...
+
+
+--------------------------------------------------------------------------------------------------
+-----------------------     First-Order Logic:   -------------------------------------------------
+--------------------------------------------------------------------------------------------------
+
+
+Problem 4. (3 points).                                   @n@nota4:
+
+John has written a C++ program P that takes as input an arbitrary first-order formula F.  He
+says that, if F is a tautology, P always outputs "yes" after a finite amount of time, and if F
+is NOT a tautology, P outputs "no" or it does not terminate.  Is this possible?  If this is not
+possible, explain why. If it is possible, explain how and why P would work.
+
+
+...
+
+--------------------------------------------------------------------------------------------------
+
+Problem 5. (3 points).                                   @n@nota5:
+
+5a) Is the formula Ax Ey ( p(f(x),y) & -p(x,y) )  satisfiable? Prove it.
+
+...
+
+5b) Are the following two formulas F and G logically equivalent? Prove it a simply as you can.
+F:   Ax Ey ( p(f(x),y) & -p(x,y) )
+G:   Ey Ax ( p(f(x),y) v -p(x,y) )
+
+...
+
+--------------------------------------------------------------------------------------------------
+
+Problem 6. (4 points).                                   @n@nota6:
+
+Formalise the following sentences in first-order logic and prove by resolution that the last
+one (g) is a logical consequence of the others a & b & c & d & e & f.
+
+a: If a king is magic then he steals from all his citizens.
+b: A king is magic if he is the son of a magic king.
+c: Johnny is a magic king.
+d: Phil is the son of Johnny.
+e: Mary is a citizen of Phil.
+f: Phil does not steal from Mary.
+g: This year FC Barcelona will win the League.
+
+
+...
+
+--------------------------------------------------------------------------------------------------
+
