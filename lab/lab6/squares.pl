@@ -34,17 +34,54 @@ ejemplo(6,175,[81,64,56,55,51,43,39,38,35,33,31,30,29,20,18,16,14,9,8,5,4,3,2,1]
 %%   3  3  3  3  3  3  1  1  1  1  3  3  3  3  3  3  3  3  3
 
 
+%SIDES == SUB QUADRATS
+%N     == NUMERO DE SUB QUADRATS
+%COLVARS  == POSICION COLUMNA DE LA ESQUINA SUPERIOR IZQUIERDA DEL CUADRADO I-ESSIMO 
+%ROWVARS  == POSIICION FILA DE LA ESQUINA SUPERIOR IZQUIERDA DEL CUADRADO I-ESSIMO
+%las 2 listas podrian pensarse como una lista de esquinas, pair<row,col>
+
+
 main:- 
     ejemplo(3,Big,Sides),
     nl, write('Fitting all squares of size '), write(Sides), write(' into big square of size '), write(Big), nl,nl,
     length(Sides,N), 
     length(RowVars,N), % get list of N prolog vars: Row coordinates of each small square
-    ...
+    length(ColVars,N),
+    %1 vars 
+    RowVars ins 1..Big,
+    ColVars ins 1..Big,
+    %2 constraints
     insideBigSquare(N,Big,Sides,RowVars),
     insideBigSquare(N,Big,Sides,ColVars),
     nonoverlapping(N,Sides,RowVars,ColVars),
-    ...
+    %3 labeling
+    append(RowVars,ColVars,Vars),
+    label(Vars),
+
+    %4 write solution
     displaySol(Big,Sides,RowVars,ColVars), halt.
+
+insideBigSquare(_,_,[],[]):-!.
+insideBigSquare(N,Big, [S | Sides], [V | Vars]):- 
+    V + S - 1 #=< Big,
+    insideBigSquare(_,Big,Sides,Vars).
+
+nonoverlapping(_, [],[],[]):-!.
+nonoverlapping(N,[S | Sides],[R | RowVars],[C | ColVars]):- 
+        bombardeenprolog(S,R,C ,Sides,RowVars,ColVars), 
+        nonoverlapping(0,Sides,RowVars,ColVars).
+
+%%amb aquesta funcio posem les restriccions necessaries per a que no es solapi cap quadrat amb el actual
+bombardeenprolog(_ , _ , _ , [], [], []):- !.
+bombardeenprolog(SIZE, R ,C , [R1 | RowVars], [C1 | ColVars],[SIZE1| Sizes]):-
+    ((R + SIZE) #=< R1) #\/ 
+    ((C + SIZE) #=< C1) #\/
+    ((R1 + SIZE1) #=< R) #\/
+    ((C1 + SIZE1) #=< C),
+    bombardeenprolog(SIZE,R,C,RowVars,ColVars,Sizes).  
+
+
+
 
 
 displaySol(N,Sides,RowVars,ColVars):- 
@@ -57,4 +94,8 @@ displaySol(_,_,_,_):- nl,nl,!.
 
 writeSide(S):- S<10, write('  '),write(S),!.
 writeSide(S):-       write(' ' ),write(S),!.
+
+
+
+
 

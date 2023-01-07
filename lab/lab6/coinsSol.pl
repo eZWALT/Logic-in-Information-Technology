@@ -1,6 +1,6 @@
 :- use_module(library(clpfd)).
 
-ejemplo(0,   26, [1,2,5,10] ).  % Solution: [1,0,1,2]
+ejemplo(0,   300, [1,10] ).  % Solution: [1,0,1,2]
 ejemplo(1,  361, [1,2,5,13,17,35,157]).
 
 main:- 

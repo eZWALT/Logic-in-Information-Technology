@@ -1,0 +1,267 @@
+--------------------------------------------------------------------------------------------------
+Logic in Computer Science, January 13th, 2021. Time: 2h30min. No books or lecture notes allowed.
+--------------------------------------------------------------------------------------------------
+Note on evaluation: eval(propositional logic) = max(eval(Problems 1,2,3), eval(partial exam))
+                    eval(first-order logic)   = eval(Problems 4,5,6).
+
+-Insert your answers on the dotted lines ... below, and only there.
+-Do NOT modify the problems or the @nota lines.
+-When finished, upload this file with the same name: exam.txt
+-Use the text symbols:     &     v    -       ->          |=        A       E
+   for                    AND   OR   NOT   IMPLIES   "SATISFIES"  FORALL  EXISTS,  like in:
+   I  |=  p & (q v -r)     (the interpretation I satisfies the formula p & (q v -r)  ).
+   You can write subindices using "_". For example write x_i to denote x-sub-i.
+--------------------------------------------------------------------------------------------------
+
+
+
+Problem 1. (4 points).                                   @n@nota1:
+
+
+1a) Is it true that for any three propositional formulas F, G, H, we have that F & (G v H) is a
+tautology iff (-G & H) v -F is unsatisfiable? Prove it using only the definition of propositional logic.
+
+
+Answer: No. Counter example:
+Let F be p v -p, let G be p and let H be -p. Then F & (G v H) is the formula (p v -p) & (p v -p)
+which is a tautology. But (-G & H) v -F is the formula (-p & -p) v -(p v -p), which is satisfiable,
+because any I with I(p) = 0 is a model.
+
+
+1b) Is it true that for any two propositional formulas F and G, we have that -F v G is a tautology
+if and only if F |= G? Prove it using only the definition of propositional logic.
+
+
+Answer: Yes.
+-F v G is a tautology                             iff  by definition of tautology
+forall I, I |= -F v G                             iff  by definition of |=
+forall I, eval_I(-F v G) = 1                      iff  by definition of evaluation of v
+forall I, max(eval_I(-F), eval_I(G)) = 1          iff  by definition of evaluation of -
+forall I, max(1 − eval_I(F), eval_I(G)) = 1       iff  by definition of max and eval
+forall I, eval_I(F) = 0 or eval_I(G) = 1          iff  by definition of satisfaction
+forall I, I 6|= F or I |= G                       iff  by definition of logical consequence
+F |= G
+
+--------------------------------------------------------------------------------------------------
+
+Problem 2. (3 points).                                   @n@nota2:
+For each one of the following statements, indicate if it is true or false for propositional logic.
+Answer T (true) or F (false) on each dotted line ... Give no explanations why.
+Below always F,G,H are formulas and I is an interpretation.
+Note: Wrong ansers subtract 0.4 points. Unanswered questions subtract 0.2 points.
+
+     Answer:
+ 1)    F      If F is unsatisfiable, then -F |= F.
+ 2)    F      The closure under resolution Res(S) of a finite set of clauses S is always a DNF.
+ 3)      T    It is decidable in polynomial time whether a given formula in DNF is satisfiable.
+ 4)    F      Given a formula F, the Tseitin transformation of F is a set of clauses that is logically equivalent to F.
+ 5)      T    If F is a unsatisfiable, then for every G we have F |= G.
+ 6)      T    Given a formula F, the Tseitin transformation of F always has a number of clauses that is linear in the size of F.
+ 7)      T    The Tseitin transformation can be used for reducing SAT to 3-SAT.
+ 8)    F      It is decidable in polynomial time whether a given formula is a tautology.
+ 9)      T    The closure under resolution Res(S) of a finite set of clauses S is always a finite set of clauses.
+10)    F      The formula  p v p  is a logical consequence of  (p v r)  &  (-q v r)  &  (q v r). 
+11)      T    It is decidable in polynomial time whether a given formula in CNF is a tautology.
+12)      T    Given I and F, it is decidable in linear time whether I |= F.
+13)      T    There are formulas F and G such that  F |= G  and  F |= -G.
+14)      T    If  F v G  |=  H  then F & -H is unsatisfiable. 
+15)    F      The closure under resolution Res(S) of a set of clauses S always has a number of clauses that is cubic in the size of S.
+16)      T    If F is a tautology, then for every G we have G |= F.
+
+
+--------------------------------------------------------------------------------------------------
+
+
+Problem 3. (3 points).                                   @n@nota3:
+
+We want to 3-color a given graph with n nodes: assign one of the 3 colors to each
+node such that for each edge (u,v), nodes u and v do not get the same color of the three colors.
+Of course this may be impossible, so we will allow some nodes to remain uncolored: these nodes get no color.
+Now use a SAT solver to compute the 3-coloring with the minimal number of such uncolored nodes.
+Explain very briefly:
+
+3a) The propositional symbols (variables) you use and their meaning (hint: use a special one no_i meaning "node i gets no color")
+3b) The clauses and constraints you use (no need to explain how the constraint is encoded into clauses)
+3c) How you optimize by means of different calls to the SAT solver
+
+
+Answer:
+
+3a) For each node i, four variables:        c1_i, c2_i, c3_i, no_i   (i has color 1,2,3 or none)
+
+3b) For each node i, one clause:            c1_i  v  c2_i  v  c3_i  v  no_i
+    For each edge (i,j), three clauses:    -c1_i  v -c1_j,     -c2_i v -c2_j,     -c3_i v -c3_j  
+    One cardinality constraint:             no_i + ... + no_n <= k
+
+3c) First call the solver with k=n.
+    While we get a new solution with cost c, call the solver again with k = c-1, until UNSAT.
+    Then the last solution found is the optimal one.
+
+
+
+--------------------------------------------------------------------------------------------------
+-----------------------     First-Order Logic:   -------------------------------------------------
+--------------------------------------------------------------------------------------------------
+
+
+Problem 4. (3 points).                                   @n@nota4:
+
+John has written a C++ program P that takes as input an arbitrary first-order formula F.  He
+says that, if F is a tautology, P always outputs "yes" after a finite amount of time, and if F
+is NOT a tautology, P outputs "no" or it does not terminate.  Is this possible?  If this is not
+possible, explain why. If it is possible, explain how and why P would work.
+
+
+ANSWER:
+Yes. This problem (TAUT in FOL) is semi-decidable. How?
+We have   F taut   IFF   -F unsat   IFF   S=clausalForm(-F) unsat   IFF   the empty clause [] is in ResFact(S).
+John's semi-decision procedure P can compute S and then start computing the sets S0,S1,S2,... whose union is ResFact(S).
+If F is a tautology,     it wil always terminate (with output "yes"), because then [] is in Si for some i.
+If F is not a tautology, [] will never appear, and we terminate (with "no") only if ResFact(S) is finite.
+
+Note: to get all 3 points you MUST explain why computing ResFact(S) always terminates if F is a tautology !
+
+
+--------------------------------------------------------------------------------------------------
+
+Problem 5. (3 points).                                   @n@nota5:
+
+5a) Is the formula Ax Ey ( p(f(x),y) & -p(x,y) )  satisfiable? Prove it.
+
+Answer: yes it is. Here is a model I:
+D_I={a,b}
+
+p_I(a,a)=1
+p_I(a,b)=0
+p_I(b,a)=0
+p_I(b,b)=1
+
+f_I(a)=b
+f_I(b)=a
+
+if x=a then pick y=b
+if x=b then pick y=a
+
+
+5b) Are the following two formulas F and G logically equivalent? Prove it a simply as you can.
+
+F:   Ax Ey ( p(f(x),y) & -p(x,y) )
+
+G:   Ey Ax ( p(f(x),y) v -p(x,y) )
+
+Not equivalent. This I is a model of G and not of F:
+D_I={a}
+p_I(a,a)=1
+f_I(a)=a
+
+
+Another solution: the model of F given in 5a, which is not a model of G:
+                                           G:   Ey Ax ( p(f(x),y) v -p(x,y) )
+ y cannot be a, because then for x=a we have                 b=a  v   a!=a       which is false
+ y cannot be b, because then for x=b we have                 a=b  v   b!=b       which is false
+
+
+
+--------------------------------------------------------------------------------------------------
+
+Problem 6. (4 points).                                   @n@nota6:
+
+Formalise the following sentences in first-order logic and prove by resolution that the last
+one (g) is a logical consequence of the others a & b & c & d & e & f.
+
+a: If a king is magic then he steals from all his citizens.
+b: A king is magic if he is the son of a magic king.
+c: Johnny is a magic king.
+d: Phil is the son of Johnny.
+e: Mary is a citizen of Phil.
+f: Phil does not steal from Mary.
+g: This year FC Barcelona will win the League.
+
+
+Answer: Obviously g has nothing to do with a-f. So the only way to that prove g is a logical 
+        consequence is to prove that a & b & c & d & e & f is unsatifsfiable.  Formalising:
+
+a: If a king is magic then he steals from all his citizens
+   Ax (  magic(x) --> Ay (  citizenOf(x,y) --> stealsFrom(x,y) ) )
+   Ax (  magic(x) --> Ay ( -citizenOf(x,y)  v  stealsFrom(x,y) ) )
+   Ax ( -magic(x)  v  Ay ( -citizenOf(x,y)  v  stealsFrom(x,y) ) )
+        -magic(x)  v       -citizenOf(x,y)  v  stealsFrom(x,y)
+
+b: A king is magic if he is the son of a magic king
+   Ax (  Ey ( magic(y) &  son(y,x) ) --> magic(x) )
+   Ax ( -Ey ( magic(y) &  son(y,x) )  v  magic(x) )
+   Ax ( Ay -( magic(y) &  son(y,x) )  v  magic(x) )
+   Ax ( Ay   -magic(y) v -son(y,x) )  v  magic(x) )
+             -magic(y) v -son(y,x)    v  magic(x)
+   
+c: Johnny is a magic king
+   magic(Johnny)
+d: Phil is the son of Johnny
+   son(Jhonny,Phil)
+e: Mary is a citizen of Phil
+   citizenOf( Phil,Mary)
+f: Phil does not steal from Mary
+   -stealsFrom(Phil,Mary)
+
+
+So we get 6 clauses:
+a  -magic(x)   v   -citizenOf(x,y)   v   stealsFrom(x,y)
+b  -magic(y)   v   -son(y,x)         v   magic(x)
+c   magic(Johnny)
+d   son(Jhonny,Phil)
+e   citizenOf( Phil,Mary)
+f  -stealsFrom(Phil,Mary)
+
+
+        resolution		                                 
+num       between     sigma	          new clause             
+-------------------------------------------------------------
+1          c,b       {y=Johnny}   -son(Johnny,x) v magic(x)  
+2          1,d       {x=Phil}      magic(Phil)                 
+3          2,a       {x=Phil}     -citizenOf(Phil,y)  v  stealsFrom(Phil,y)
+4          3,e       {y=Mary}     stealsFrom(Phil,Mary)
+5          4,f       {}           []
+
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+
+Alternative more complicated solution adding also the predicate king(x):
+
+a: If a king is magic then he steals from all his citizens
+   Ax (    king(x)  &  magic(x)   --> Ay (  citizenOf(x,y) --> stealsFrom(x,y) ) )
+   Ax (    king(x)  &  magic(x)   --> Ay ( -citizenOf(x,y)  v  stealsFrom(x,y) ) )
+   Ax ( -( king(x)  &  magic(x) )  v  Ay ( -citizenOf(x,y)  v  stealsFrom(x,y) ) )
+   Ax (   -king(x)  v -magic(x)    v  Ay ( -citizenOf(x,y)  v  stealsFrom(x,y) ) )
+          -king(x)  v -magic(x)    v       -citizenOf(x,y)  v  stealsFrom(x,y)
+
+b: A king is magic if he is the son of a magic king
+   Ax (       king(x) &  Ey  (  king(y) &  magic(y) &  son(y,x) )   --> magic(x) )
+   Ax (  -(   king(x) &  Ey  (  king(y) &  magic(y) &  son(y,x) ) )  v  magic(x) )
+   Ax (      -king(x) v -Ey  (  king(y) &  magic(y) &  son(y,x) )    v  magic(x) )
+   Ax (      -king(x) v  Ay -(  king(y) &  magic(y) &  son(y,x) )    v  magic(x) )
+   Ax (      -king(x) v  Ay  ( -king(y) v -magic(y) v -son(y,x) )    v  magic(x) )
+             -king(x) v        -king(y) v -magic(y) v -son(y,x)      v  magic(x)  
+
+Then we get 8 clauses:
+a  -king(x)   v   -magic(x)   v   -citizenOf(x,y)   v   stealsFrom(x,y)
+b  -king(x)   v   -king(y)    v   -magic(y)         v   -son(y,x)         v   magic(x)
+c1  magic(Johnny)
+c2  king(Johnny)
+d   son(Jhonny,Phil)
+e1  citizenOf( Phil,Mary)
+e2  king(Phil)                 // Phil is a king since Mary is a citizen of his
+f  -stealsFrom(Phil,Mary)
+
+        resolution		                                 
+num       between     sigma	          new clause             
+-------------------------------------------------------------
+1          e2,b      {x=Phil}      -king(y)   v  -magic(y)   v   -son(y,Phil)         v   magic(Phil)
+2          1,c2      {y=Johnny}    -magic(Johnny)   v   -son(Johnny,Phil)         v   magic(Phil)
+3          2,c1      {}            -son(Johnny,Phil)         v   magic(Phil)
+4          3,d       {}             magic(Phil)
+5          a,e2      {x=Phil}      -magic(Phil)  v  -citizenOf(Phil,y)   v   stealsFrom(Phil,y)
+6          5,4       {}            -citizenOf(Phil,y)   v   stealsFrom(Phil,y)
+7          6,e1      {y=Mary}      stealsFrom(Phil,Mary)
+8          7,f       {}            []
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------

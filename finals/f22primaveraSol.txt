@@ -1,0 +1,250 @@
+--------------------------------------------------------------------------------------------------
+Logic in Computer Science, June 14th, 2022. Time: 2h30min. No books or lecture notes allowed.
+--------------------------------------------------------------------------------------------------
+Note on evaluation: eval(propositional logic) = max(eval(Problems 1,2,3), eval(partial exam))
+                    eval(first-order logic)   = eval(Problems 4,5,6).
+
+-Insert your answers on the dotted lines ... below, and only there.
+-Do NOT modify the problems or the @nota lines or the @answer lines
+-When finished, upload this file with the same name: exam.txt
+-Use the text symbols:     &     v    -       ->          |=        A       E
+   for                    AND   OR   NOT   IMPLIES   "SATISFIES"  FORALL  EXISTS,  like in:
+   I  |=  p & (q v -r)     (the interpretation I satisfies the formula p & (q v -r)  ).
+   You can write subindices using "_". For example write x_i to denote x-sub-i.
+--------------------------------------------------------------------------------------------------
+
+
+Problem 1. (3 points).                                   @n@nota1:
+
+1a)
+Let F and G be two logically equivalent propositional formulas.
+Prove that then, for every other formula H, we have  F |= H  iff  G |= H.
+Prove it as simply as you can using only the definitions of propositional logic, filling the
+dots ... below (use as many lines as you need).
+
+F |= H                   iff       [by definition of ... ]
+...                      iff       [by definition of ... ]
+...                      iff       [because F and G are logically equivalent we have ... ]
+...                      iff       [by definition of ... ]
+...                      iff       [by definition of ... ]
+G |= H.
+
+
+
+Answer:
+F |= H                                   iff       [by definition of |= ]  
+for all I, I |= F implies I |= H         iff       [by definition of implies ]
+for all I,  not I |= F or I |= H         iff       [because F and G are logically equivalent we have I|=F iff I|=G
+for all I,  not I |= G or I |= H         iff       [by definition of implies ]
+for all I, I |= G implies I |= H         iff       [by definition of |= ]
+G |= H
+
+
+
+1b)
+Let F and G be two propositional formulas that are not logically equivalent.
+Is it true that then there is always some formula H such that  G |= H  but not F |= H?
+Answer YES or NO and then prove it in three short lines, using only the definitions of propositional logic.
+Hint: Give concrete formulas F and G. Then consider any H  such that  not F |= H.
+
+Answer:
+NO. Counterexample: we give concrete F and G for which no H with the given requirements can exist:
+
+F is p&-p, G is p. They are not logically equivalent because G is satisfiable and F is not.
+Since F is unsatisfiable we have F|=H for all H, so there is no H such that  G |= H  and  not F |= H.
+
+Note: giving concrete F,G and also a concrete H proves nothing.
+
+
+
+1c)
+Let F be p & q
+Let G be p v q
+Write an AS SIMPLE AS POSSIBLE formula H that is not logically equivalent to F, not logically equivalent to G, and such
+that F |= H  and H |= G. Give NO explanations.
+
+Answer:
+p
+
+
+
+
+Problem 2. (4 points).
+
+For each one of the following statements, indicate if it is true or false for propositional logic.
+Below always F,G,H are formulas and I is an interpretation. Note: Wrong ansers subtract 0.2 points.
+     
+ 1    It is decidable in polynomial time whether a given formula in CNF is a tautology.
+ 2    Given I and F we can decide in linear time whether I |= F 
+ 3    Given I and F we can decide in linear time whether I is a minimal model of F, that is, a model I with the
+           minimal number of symbols p such that I(p) = 1
+ 4    It is decidable in polynomial time whether a given formula in DNF is satisfiable.
+ 5    Given a formula F, the Tseitin transformation of F is a set of clauses that is logically equivalent to F.
+ 6    If F is a unsatisfiable, then for every G we have F |= G.
+ 7    Given a formula F, the Tseitin transformation of F always has a number of clauses that is linear in the size of F.
+ 8    It is decidable in polynomial time whether a given formula is a tautology.
+ 9    Given a set of Horn clauses S,  we can find in linear time a minimal model I of S, that is, a model I with
+           the minimal   | { p | I(p)=1 } |.
+10    For every formula F there is a set of clauses S that is equisatisfiable to F and such that no clause
+           in S has more than 3 literals.
+11    The closure under resolution Res(S) of a finite set of clauses S is always a finite set of clauses.
+12    If S is a set of 2-SAT clauses (that is, clauses with at nost two literals), then |Res(S)| is quadratic in |S|.
+13    For every formula F there is a set of clauses S that is equisatisfiable to F and such that S has 3n+1
+           clauses, where n is the number of AND and OR connectives in F.
+14    Given I and F, it is decidable in linear time whether I |= F.
+15    If there are n propositional symbols, there are 4^n  (4 to the power n) different clauses
+16    There are formulas F and G such that  F |= G  and  F |= -G.
+17    If F is unsatisfiable, then -F |= F.
+18    If  F v G  |=  H  then F & -H is unsatisfiable. 
+19    The closure under resolution Res(S) of a set of clauses S always has a number of clauses that is cubic in the size of S.
+20    If F is a tautology, then for every G we have G |= F.
+
+
+Insert your answers in the prolog list of lenght 20 below, replacing (part of) the - symbols with t (true) or f
+(false), getting something like this:  [t,-,f,f,f,-,t,f,-,-,-,-,f,f,-,t,t,-,f,-]
+
+         1                10                  20
+         1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 
+@answer([-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-]).               %  do not remove this: Permutation 213.
+
+
+Answer:  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 
+        [t,t,f,t,f,t,t,f,t,t,t,t,t,t,t,t,f,t,f,t]
+
+
+
+Problem 3. (3 points).                                   @n@nota3:
+
+
+3a)
+Let F be (p & q)  v (-r & -q)  and let G be p & (q v -r).  Do we have F |= G?
+Answer YES or NO and prove your answer by resolution or by giving an interpretation.
+
+Answer:
+NO: if I(p)=0, I(q)=0, I(r)=0 then I is a model of F but not of G.
+
+
+3b)
+Given a formula F, a minimal model I of F is a model with the minimal number of symbols p such that I(p) = 1.
+Is it true that every formula has a unique minimal model?
+Answer YES or NO and prove your answer in the simplest possible way.
+
+
+Answer:
+NO. The formula p v q has two minimal models I1 and I2: I1(p)=1, I1(q)=0 and also I2(p)=0, I2(q)=1.
+
+
+3c)
+Write the simplest possible propositional formula that has exactly 1023 models.  Hint: note that 1023 = 2^10 - 1.
+Give no explanations.
+
+Answer:
+p1 v p2 v ... v p10
+
+
+
+
+_____________________________________________________________________________________
+
+FIRST-ORDER LOGIC.
+_____________________________________________________________________________________
+
+
+Problem 4. (4 points).                                   @n@nota3:
+
+
+4a)
+Let f be a binary function symbol. Consider the two first-order interpretations I1 and I2:
+   D_I1 = N (the natural numbers)    f_I1(n,m) = n*m
+   D_I2 = Z (the integers)           f_I2(n,m) = n*m
+Write a formula F in first-order with equality (FOLE), with NO other function or predicate symbols than f and equality,
+such that F distinguishes I1 and I2, that is, such that F is true in one of I1 or I2 and false in the other.
+Give NO explanations.
+Hint: express "for every non-zero x there is another number y with the same square". But express "non-zero" using only f!
+
+Answer:
+   Ax (    Ez f(x,z)!=x   -->  Ey  ( x!=y  &  f(x,x)=f(y,y)  )    )
+
+
+
+4b) Answer the same question, but now:
+   D_I1 = Q (the rational numbers)    f_I1(n,m) = n*m
+   D_I2 = R (the real     numbers)    f_I2(n,m) = n*m
+
+
+Answer:
+   Ax Ey  f(f(y,y),f(y,y)) = f(x,x)    ("every square has a fourth root"; false in Q, true in R).
+Or:
+   AxAy (   ( f(x,x)=f(y,y) &  x!=y ) --> Ez ( f(z,z)=x v f(z,z)=y ) )
+     ("if two different numbers x and y have the same square, then at least one of them has a
+       square root"; also false in Q, true in R).
+
+------------------------------------------------------------------------------------
+
+Problem 5. (2 points).                                   @n@nota5:
+
+5a) Is the following formula satisfiable? Answer YES or NO and prove it.
+
+   Ax -p(x,x)   &   AxAyAz( p(x,y)&p(y,z) -> p(x,z) )    &    AxEy p(x,y)   &    ExAy -p(y,x)
+
+
+Answer:
+YES. The following interpretation I is a model: D_i=N  and  p_I(n,m)= n<m.
+
+Note that irreflexivity  Ax -p(x,x)  and transitivity  AxAyAz ( p(x,y) & p(y,z) -> p(x,z) ) imply
+that p_I is a strict ordering. Together with  AxEy p(x,y) this implies we also need an infinite domain, and 
+ExAy -p(y,x) means  there is a "minimal" element x (e.g., the 0 of N).
+
+
+
+------------------------------------------------------------------------------------
+Problem 6. (4 points).                                   @n@nota6:
+Formalize and prove by resolution that sentence F is a logical consequence of the first five.
+   A. If someone uses a gun he can kill anyone else.
+   B. Pete is John's son.
+   C. If someone has something, then he/she uses it.
+   D. John has a gun.
+   E. If a father has something, then his sons also have it.
+   F. Pete can kill John.
+
+Use constant symbols Gun, John and Pete, and predicate symbols:
+   has(x,y) meaning "x has y"
+   uses(x,y) meaning "x uses y"
+   son(x,y) meaning "x is the son of y"
+   canKill(x,y) meaning "x can kill y".
+
+Answer:
+
+Formalization:
+ A:   Ax ( uses(x,Gun) --> Ay canKill(x,y) )
+ B:   son(Pete,John)
+ C:   Ax Ay ( has(x,y) --> uses(x,y) )
+ D:   has( John, Gun )
+ E:   Ax Ay Az ( has(x,y) & son(z,x) --> has(z,y) )
+-F:   -canKill( Pete, John )
+
+
+Clausal form:
+ A:  -uses(x,Gun)  v  canKill(x,y)
+ B:  son(Pete,John)
+ C:  -has(x,y) v uses(x,y)
+ D:  has( John, Gun )
+ E:  -has(x,y) v -son(z,x) v has(z,y)
+-F:  -canKill( Pete, John )
+
+
+F is a logical consequence of  A & B & C  & D & E    iff
+A & B & C & D & E & -F is unsatisfiable              iff
+we can obtain by resolution the empty clause from clauses A & B & C & D & E & -F:
+
+N   From:     mgu:                     new clause by resolution:
+-------------------------------------------------------------------
+1.  B, E       { z=Pete, x=John }     -has(John,y) v has(Pete,y)
+2.  1, D       { y=Gun }               has(Pete,Gun)
+3.  2, C       { x=Pete,y=Gun }        uses(Pete,Gun)
+4.  3, A       { x=Pete }              canKill(Pete,y)
+5.  4, -F      { y=John }              []
+
+-----------------------------------------------------------------------
+
+

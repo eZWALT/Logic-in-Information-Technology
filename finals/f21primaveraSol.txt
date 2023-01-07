@@ -1,0 +1,211 @@
+======================================================================================
+Lógica en la Informática / Logic in Computer Science
+June 17th, 2021. Time: 2h30min. No books or lecture notes allowed.
+
+Note on evaluation: nota(propositional logic) = max( nota(Problems 1,2,3,4), nota(partialExam) )
+                    nota(first-order logic)   = eval(Problems 5,6,7).
+
+-Insert your answers on the dotted lines ... below, and only there.
+-The number of dots in a dotted line does NOT indicate the number of items to fill in.
+-Do NOT modify the problems or the @nota lines.
+-When finished, upload this file with the same name: exam.txt
+
+======================================================================================
+
+Use the text symbols:     &    v   -   |=       for     AND  OR  NOT  and  "SATISFIES",   like:
+      I  |=  p & (q v -r)     (the interpretation I satisfies the formula p & (q v -r)  ).
+
+======================================================================================
+
+
+Problem 1. (3 points).                                   @n@nota1:
+For each one of the following statements, indicate if it is true or false for propositional logic.
+Answer T (true) or F (false) on each dotted line ... Give no explanations why.
+Below always F,G,H are formulas and I is an interpretation.
+
+Answer:
+  F      If H is not a logical consequence of F & G   then  F & G & H is unsatisfiable. 
+  T      If F is a tautology, then for every G we have G |=  F.
+  T      If F is unsatisfiable then -F is a tautology.
+  T      If  F & G  |=  -H then F & G & H is unsatisfiable.
+  T      There are infinitely many different formulas, even if there is only one predicate symbol.
+  T      F |= G  iff  F & -G is unsatisfiable.
+  T      Given I and F, it is decidable in linear time whether I |= F.
+  T      Given F, it is decidable whether F is satisfiable.
+  T      If  F v G  |=  H  then F & -H is unsatisfiable. 
+  T      The formula  p v p  is a logical consequence of  (p v q v r)  &  (-q v r)  &  (-r). 
+  F      If F is unsatisfiable, then for every G we have G |= F.
+  T      There are formulas F and G such that  F |= G  and  F |= -G.
+  T      The formula  (p v q) &  (-p v q) &  (-p v -q) & (-q v p)  is unsatisfiable.
+  F      If F is a tautology, then for every G we have F |= G. 
+  F      If F is unsatisfiable then -F  |=  F.
+  T      F is satisfiable if, and only if, all logical consequences of F are satisfiable formulas.
+
+
+------------------------------------------------------------------------------------
+Problem 2. (1 point).                                   @n@nota2:
+What is the cost of deciding the satisfiability of a given set of clauses S?
+Answer without explaining why, for the following cases:
+
+2a) All clauses in S are Horn clauses.
+
+Answer: linear
+
+2b) All clauses in S are one-literal or two-literal clauses.
+
+Answer: linear
+
+2c) All clauses in S are one-literal,  two-literal, or three-literal clauses.
+
+Answer: NP-complete
+
+
+
+------------------------------------------------------------------------------------
+Problem 3. (3 points).                                   @n@nota3:
+Same question as problem 2. In this case, explain very briefly why.
+For b) and c): try to give a precise cost. Hint for b): how many ways are there to satisfy the clause C?
+
+3a) For each clause C in S we have:  C is a Horn clause or C is a two-literal clause.
+
+Answer: NP-complete. When you combine them, it does not help that Horn-SAT and 2-SAT are linear individually.
+        To show NP-hardness, we can easily reduce any SAT problem for a clause set S to it:
+	Let x1...xn be the variables in S. Introduce new variables y1...yn.
+	Let S1 be the set of clauses all 2n clauses xi v yi,   -xi v -yi, indicating that yi is the negation of xi.
+        Replace all positive literals xi in S by -yi, obtaining the clause set S2.
+	Then S is satisfiable iff the set S1 U S2 is satisfiable (but all clauses in S1 are Horn and
+	all clauses of S2 are 2-literal clauses).
+
+3b) All clauses in S are Horn clauses, except for one clause C in S.
+
+Answer: cuadratic: for each literal lit in C, try a linear Horn-Sat for  S U {lit}.
+
+3c) All clauses in S are Horn clauses, except for two clauses C1 and C2.
+
+Answer: cubic: for each lit1 in C1 and each lit2 in C2, try a linear Horn-Sat for S U {lit1,lit2}.
+
+
+
+------------------------------------------------------------------------------------
+Problem 4. (3 points).                                   @n@nota4:
+MaxSAT is the problem that takes as input a natural number k and a set of propositional clauses S, and
+it asks whether there is any interpretation I satisfying at least k clauses of S.
+
+4a) Do you think that MaxSAT is polynomial? NP-complete? Exponential? Explain very briefly why.
+
+Answer: NP-complete:
+-it is in NP because we can check solutions in PTIME (in fact, linear time).
+-it is NP-hard, because we can reduce SAT of a set of clauses S to MaxSAT of S setting k=|S|.
+
+4b) How would you use a SAT solver to decide MaxSAT?
+
+Answer: Let S  be {C1...Cn}. Introduce new variables a1...an.
+        Let S1 be {C1 v -a1 ... Cn v -an}.
+	Let S2 be the set of clauses encoding the cardinality constraint a1+...+an >= k.
+	Run the SAT solver on S1 U S2.
+	
+4c) How would you use a SAT solver to solve the optimization version of MaxSAT, that is,
+how to find the $I$ that satisfies as many of the clauses of $S$ as possible?
+
+Answer: As in 4b, but:
+        step 1: starting with k=1.
+	step 2: If satisfiable with I where I(a1)+...+I(an) = q, re-run step 2 with k = q+1.
+        Repeat until unsat. The optimal will be the q of the last solution.
+	
+
+=======================================================================
+FIRST-ORDER LOGIC.
+
+
+Problem 5. (3 points).                                   @n@nota5:
+For each one of the following statements, indicate if it is true(T) or false(F) for first-order logic.
+Give no explanations why. Below always F,G,H are formulas and I is an interpretation.
+
+Answer:
+  T      There are infinitely many different formulas, even if there is only one predicate symbol.
+  F      Given I and F, it is decidable in linear time whether I |=  F.
+  F      Given I and F, it is decidable whether I |=  F.
+  F      Given F, it is decidable in polynomial time whether F is satisfiable.
+  F      Given F, it is decidable whether F is satisfiable.
+  T      F |= G iff F & -G is unsatisfiable.
+  T      F is a tautology  iff  -F is unsatisfiable.
+  F      Given F and G, it is co-semi-decidable whether  F |= G.
+  T      Given F and G, it is semi-decidable whether F and G are logically equivalent,
+  F      We can express with a formula F that all models of F have a domain of size at most 3.
+  T      Given a formula F and an interpretation I with domain D_I of size 4, it is decidable whether I |=  F.
+
+
+------------------------------------------------------------------------------------
+Problem 6. (3 points).                                   @n@nota6:
+6a) Is the formula  Ax ( -p(x,f(x))  &  -p(f(x),x)  &  ( Ey p(f(x),y)  v  Ez p(z,f(x)) )   )  satisfiable?  Prove it.
+
+
+Answer: yes. For example the following interpretation I is a model:
+        D_I = {a,b}
+        f_I(a) = a
+        f_I(b) = b    
+        p_I(a,a) = 0
+        p_I(a,b) = 1
+        p_I(b,a) = 1
+        p_I(b,b) = 0        Another model: the natural numbrs with f the identity function and p >.
+    
+6b) 
+Let I1 and I2 be first-order interpretations with domains D_I1 = Q (the rationals) and D_I2 = R (the reals).
+In both interpretations, the unary function symbol "square" is interpreted as square_I(x) = x*x. 
+Write a formula F in FOLE (first-order logic with equality), using no other predicate or function symbols
+apart from square, such that F is true in one of the interpretations and false in the other one.
+
+Answer:
+First note that it is NOT correct to say that every number has a square root, like Ax Ey square(y)=x  because this
+is false in BOTH interpretations because of the negative numbers.  Nice try, though.
+
+But we can say that every square number x has a fourth root z (false in Q, true in R):
+      Ax (   (Ey square(y)=x)  -->  (Ez square(square(z))=x) )
+or, shorter:
+      Ax Ey  square(square(y))=square(x)
+
+We can also say that if two different numbers x and y have the same square (that is, x = -y) then at
+least one of them has a square root (also false in Q, true in R):
+F : AxAy ( (square(x)=square(y) & -(x=y) ) --> Ez ( square(z)=x v square(z)=y ) )
+
+
+------------------------------------------------------------------------------------
+Problem 7. (4 points).                                   @n@nota7:
+Formalize and prove by resolution that sentence F is a logical consequence of the first five:
+
+A: John eats all kind of food.
+B: If a person eats something that kills, then that person is dead
+C: Everything that does not kill and is eaten by someone is food
+D: Mary is not dead
+E: Mary eats peanuts
+F: John eats peanuts.
+
+We obtain by resolution the empty clause from A & B & C & D & E & -F:
+
+A:   Ax ( isfood(x) --> eats(john,x) )
+B:   Ax ( (Ey eats(x,y) & kills(y)) --> isdead(x) )
+C:   Ax ( (Ey eats(y,x) & -kills(x)) --> isfood(x) )
+D:   -isdead(mary)
+E:   eats(mary,peanuts)
+F:   eats(john,peanuts)
+
+Clauses:
+ A: -isfood(x) v eats(john,x)
+ B: -eats(x,y) v -kills(y) v isdead(x)
+ C: -eats(y,x) v  kills(x) v isfood(x)
+ D: -isdead(mary)
+ E: eats(mary,peanuts)
+-F: -eats(john,peanuts)
+
+Resolution:
+N   From:     mgu:              new clause:
+1.  B,D       { x=mary    }     -eats(mary,y) v -kills(y)
+2.  1,E       { y=peanuts }     -kills(peanuts)
+3.  C,2       { x=peanuts }     -eats(y,peanuts) v isfood(peanuts)
+4.  3,E       { y=mary    }     isfood(peanuts)
+5.  4,1       { x=peanuts }     eats(john,peanuts)
+6.  5,-F      {}                []
+
+-----------------------------------------------------------------------
+
+

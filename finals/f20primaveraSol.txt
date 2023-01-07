@@ -1,0 +1,204 @@
+_____________________________________________________________________________________
+
+PROPOSITIONAL LOGIC. QUESTION 1.   3.5 POINTS.
+Let F, G, H denote arbitrary propositional formulas.
+Is  -(F & -F) v G  a tautology? satisfiable? unsatisfiable?
+Prove your answer providing a proof or a counterexample using only the definitions
+of propositional logic.
+Use |= to denote the symbol of "satisfies": I |= F means "I satisfies F".
+
+ANSWER: 
+It is a tautology and hence it is satisfiable and not unsatisfiable. Proof:
+-(F & -F) v G  is a tautology                                          iff  [by definition of taut]
+forall I,     I |= -(F & -F) v G                                       iff  [by definition of |=]
+forall I,  eval_I( -(F & -F) v G ) = 1                                 iff  [by definition of eval v]
+forall I,  max( eval_I( -(F & -F) ), eval_I(G) )  = 1                  iff  [by definition of eval -]
+forall I,  max( 1- eval_I( F & -F ), eval_I(G) )  = 1                  iff  [by definition of eval &]
+forall I,  max( 1- min( eval_I( F ),   eval_I(-F) ), eval_I(G) ) = 1   iff  [by definition of eval -]
+forall I,  max( 1- min( eval_I( F ), 1-eval_I( F) ), eval_I(G) ) = 1   iff  [by definition of eval ]
+forall I,  max( 1- 0,                                eval_I(G) ) = 1   iff  [by arithmetic]
+forall I,  max( 1,                                   eval_I(G) ) = 1   iff  [by def eval and arithmetic]
+           1 = 1   
+
+
+_____________________________________________________________________________________
+
+PROPOSITIONAL LOGIC. QUESTION 2.   3.5 POINTS.
+Let F be the formula ( p & -q  v  r & p ) &  -(r v p), defined over the symbols p,q,r.
+Is F a tautology? satisfiable? unsatisfiable?
+Prove your answer by applying the Tseitin transformation (indicate the intermediate result)
+and then using the resolution method.  
+Use auxiliary variables named a2 a1 a3 a0 a4 for the & and v symbols counted from
+left to right in F. Use no other auxiliary variables.  
+Hint for resolution: start with the unit clause a0.
+
+ANSWER: 
+
+( p & -q  v  r & p ) &  -(r v p)
+    a2    a1   a3    a0     a4 
+
+a0 <--> a1 & -a4   Clause set S = { -a0 v a1,    -a0 v -a4,    -a1 v a4 v a0,      a0,
+a1 <--> a2 v a3                     -a2 v a1,    -a3 v a1,     -a1 v a2 v a3,
+a2 <-->  p & -q                     -a2 v p,     -a2 v -q,     -p v  q v a2,
+a3 <-->  r &  p                     -a3 v r,     -a3 v  p,     -r v -p v a3,
+a4 <-->  r v  p                     -r v a4,     -p v a4,      -a4 v  r v  p }
+
+
+
+GET     a1       FROM       a0       AND      -a0 v  a1          
+GET    -a4       FROM       a0       AND      -a0 v -a4          
+GET    -p        FROM      -a4       AND       -p v  a4          
+GET    -a2       FROM      -p        AND      -a2 v   p          
+GET    -a3       FROM      -p        AND      -a3 v   p          
+GET    -a1 v a3  FROM      -a2       AND      -a1 v a2 v a3      
+GET    -a1       FROM      -a3       AND      -a1 v a3           
+GET    []        FROM      -a1       AND       a1                
+
+
+F is unsatisfiable, because F and S are equisatisfiable and S is unsatisfiable.
+
+S is unsatisfiable, because the empty clause belongs to Res(S) and
+because the resolution rule of inference is correct.
+
+F is unsatisfiable. Therefore, F is not satisfiable and also not a tautology.
+
+
+_____________________________________________________________________________________
+PROPOSITIONAL LOGIC. QUESTION 3.   3 POINTS.
+
+We are interested in the optimization problem called "minOnes": given a set S of clauses over
+variables {x1...xn}, finding a "minimal" model I (if it exists), that is, a model of S with the minimal
+possible number of ones I(x1)+...+I(xn). Explain very briefly your answers to the following questions:
+3a) Does every S have a unique minimal model, or can there be several minimal models?
+3b) Given the set S and an arbitrary natural number k, what is the computational complexity of deciding whether
+S has any model I with at most k ones, that is, such that I(x1) +...+ I(xn) <= k?
+3c) Same question as 3a, if S is a set of Horn Clauses.
+3d) Same question as 3b, if S is a set of Horn Clauses.
+
+
+ANSWER:
+3A: There can be several minimal models. If S is {p ∨ q}, then I1 where I1(p) = 1 and I1(q) = 0 is
+    minimal, and I2 where I2(p) = 0 and I2(q) = 1 is also minimal.
+3B: NP-complete: it is NP-hard (at least as hard as SAT) because any SAT problem over n variables 
+    is a minOnes problem where k=n, and it is in NP because we can check in PTIME if a given solution is 
+    indeed a model with at most k ones.
+3C: Every satisfiable set of Horn clauses has a unique minimal model I: the one found by the standard
+    polynomial algorithm for Horn SAT doing unit propagation of the positive true literals, where we only
+    set to true those variables that MUST be true in any model (and therefore this I is minimal and unique).
+3D: Polynomial (in fact linear): just do as in 2C and check whether the resulting model (if any) has
+    less than k ones or not.
+
+
+_____________________________________________________________________________________
+
+FIRST-ORDER LOGIC.   QUESTION 1.   3 POINTS.
+
+Formalize the following sentences in first-order logic and prove by resolution that C
+is a logical consequence of A & B.  Use --> to denote implication.
+  A) St. Francis is loved by everyone who loves someone.
+  B) No one loves nobody. (Spanish: "no hay nadie que no ame a nadie")
+  C) St. Francis is loved by everyone.
+First, for each predicate, constant (or other function) symbol you use in
+your formalization, write its meaning and arity, as in the example below. 
+
+ANSWER: 
+predicate symbol: loves(x,y)   meaning    "x loves y",     arity 2
+function symbol:  frank        meaning    "St. Francis",   arity 0 (constant symbol)
+
+   F_A:  Ax ( Ey loves(x,y) --> loves(x,frank) )
+   F_B:  - Ex - Ey loves(x,y)
+   F_C:  Ax loves(x,frank)
+
+C is a logical consequence of A & B if and only if A & B & -C es unsatisfiable, i.e. 
+A & B |= C    iff    A & B & -C is unsatisfiable.
+
+   - F_C:  - Ax loves(x,frank)
+
+
+
+Clause set S:
+   F_A:  Ax (-Ey  loves(x,y) v loves(x,frank) )
+         Ax ( Ay -loves(x,y) v loves(x,frank) )
+     1:  -loves(x,y) v loves(x,frank) 
+
+   F_B:  -Ex -Ey loves(x,y)
+         Ax Ey  loves(x,y)
+     2:  loves(x,f(x))
+
+  - F_C:  -Ax loves(x,frank)
+          Ex -loves(x,frank)
+     3:   -loves(cx,frank)
+
+
+F_A & F_B & -F_C  and clause set S are equisatisfiable.
+
+
+S is unsatisfiable if and only if the empty clause belongs to
+ResFact(S) by the soundness and refutational completeness of
+Resolution and Factoring for First Order Logic.
+
+
+NEW CLAUSE 4  -loves(cx,y)  FROM  CLAUSE 1 AND CLAUSE 3  WITH MGU {x = cx}
+NEW CLAUSE 5  []            FROM  CLAUSE 2 AND CLAUSE 4  WITH MGU {x = cx, y = f(cx)}    
+
+_____________________________________________________________________________________
+FIRST-ORDER LOGIC.   QUESTION 2.   4 POINTS.
+ 
+A) (1 point) Write a formula F of FOL with equality, built only over the equality predicate
+(use NO other function, constant or predicate symbols)
+such that any model I of F has a domain D_I with either 2 or 3 elements, that is,
+I |= F  iff  2 <= |D_I| <= 3.
+Only write the formula F, giving NO explanations (same for B,C,D below).
+
+B) (1 point) Write a formula F of FOL with equality,
+built only over the equality predicate and one unary predicate symbol p,
+("unary" means that the arity of p is 1; use NO other function, constant or predicate symbols)
+such that  I |= F  iff  p is true for AT MOST  2 elements of D_I.
+
+C) (1 point) Like B) but now iff  p is true for AT LEAST 2 elements of D_I.
+
+D) (1 point) Like B) but now use the equality predicate and one BINARY (i.e. arity=2) predicate symbol p
+to express that any finite model of F has a domain with an even number of elements.
+Hint: express that the domain has two halves: each element is related by p to exactly one 
+element in the other half.
+
+
+ANSWER: Note: Of course many correct answers exist. 
+        Warning: your answer is NOT useful at all if you use more symbols than the ones allowed.
+
+A) Ex Ey -(x=y)  &  Ex Ey Ez Au ( u=x  v  u=y  v  u=z )
+
+B) Ex Ey Az ( p(z) --> z=x v z=y )
+
+C) Ex Ey (  -(x=y)  &  p(x) & p(y) )
+
+D) AxEy  ( -(x=y)  &  p(x,y)  &  p(y,x)  &  -Ez ( -(z=y) & (p(x,z) v p(z,x)) )  )
+
+
+_____________________________________________________________________________________
+FIRST-ORDER LOGIC.   QUESTION 3.   3 POINTS.
+
+John has written a C++ program P that takes as input two arbitrary first-order formulas F
+and G. He says that, if F and G are logically equivalent, P always outputs "yes" after a
+finite amount of time, and if F and G are NOT logically equivalent, P outputs "no" or it
+does not terminate.  Is this possible? If this is not possible, explain why. If it is
+possible, explain how P would work.
+
+
+ANSWER:
+Yes. It is possible. Denote logical equivalence by ==. We have F==G 
+iff  -F&G v F&-G unsatisfiable 
+iff  S = clausalForm(-F&G v F&-G) unsatisfiable
+iff  the empty clause [] is in ResFact(S), the closure under resolution and factoring of S. 
+ResFact(S) is defined as the union of successive sets S0,S1,S2,...
+So John’s program P can implement all those steps, and start computing S0,S1,S2,...
+
+-If F==G, it wil always terminate, because then [] is in ResFact(S) and therefore in
+          some set Si of the sequence S0,S1,S2,..., which will apear after a 
+          finite amount of time! This is when we output "yes" and terminate.
+-If not F==G, the empty clause will never appear. Then P only terminates (with output
+          "no") if the closure under resolution and factoring of S is finite.
+
+Note: to get all 3 points you MUST explain why this always terminates if F==G !
+_____________________________________________________________________________________
+

@@ -1,0 +1,160 @@
+======================================================================================
+Lógica en la Informática / Logic in Computer Science
+June 17th, 2021. Time: 2h30min. No books or lecture notes allowed.
+
+Note on evaluation: nota(propositional logic) = max( nota(Problems 1,2,3,4), nota(partialExam) )
+                    nota(first-order logic)   = eval(Problems 5,6,7).
+
+-Insert your answers on the dotted lines ... below, and only there.
+-The number of dots in a dotted line does NOT indicate the number of items to fill in.
+-Do NOT modify the problems or the @nota lines.
+-When finished, upload this file with the same name: exam.txt
+
+======================================================================================
+
+Use the text symbols:     &    v   -   |=       for     AND  OR  NOT  and  "SATISFIES",   like:
+      I  |=  p & (q v -r)     (the interpretation I satisfies the formula p & (q v -r)  ).
+
+======================================================================================
+
+
+Problem 1. (3 points).                                   @n@nota1:
+For each one of the following statements, indicate if it is true or false for propositional logic.
+Answer T (true) or F (false) on each dotted line ... Give no explanations why.
+Below always F,G,H are formulas and I is an interpretation.
+
+ ...  If H is not a logical consequence of F & G   then  F & G & H is unsatisfiable. 
+ ...  If F is a tautology, then for every G we have G |=  F.
+ ...  If F is unsatisfiable then -F is a tautology.
+ ...  If  F & G  |=  -H then F & G & H is unsatisfiable.
+ ...  There are infinitely many different formulas, even if there is only one predicate symbol.
+ ...  F |= G  iff  F & -G is unsatisfiable.
+ ...  Given I and F, it is decidable in linear time whether I |= F.
+ ...  Given F, it is decidable whether F is satisfiable.
+ ...  If  F v G  |=  H  then F & -H is unsatisfiable. 
+ ...  The formula  p v p  is a logical consequence of  (p v q v r)  &  (-q v r)  &  (-r). 
+ ...  If F is unsatisfiable, then for every G we have G |= F.
+ ...  There are formulas F and G such that  F |= G  and  F |= -G.
+ ...  The formula  (p v q) &  (-p v q) &  (-p v -q) & (-q v p)  is unsatisfiable.
+ ...  If F is a tautology, then for every G we have F |= G. 
+ ...  If F is unsatisfiable then -F  |=  F.
+ ...  F is satisfiable if, and only if, all logical consequences of F are satisfiable formulas.
+
+
+------------------------------------------------------------------------------------
+Problem 2. (1 point).                                   @n@nota2:
+What is the cost of deciding the satisfiability of a given set of clauses S?
+Answer without explaining why, for the following cases:
+
+2a) All clauses in S are Horn clauses.
+
+...        
+
+2b) All clauses in S are one-literal or two-literal clauses.
+
+...            
+
+2c) All clauses in S are one-literal,  two-literal, or three-literal clauses.
+
+...             
+
+
+
+------------------------------------------------------------------------------------
+Problem 3. (3 points).                                   @n@nota3:
+Same question as problem 2. In this case, explain very briefly why.
+For b) and c): try to give a precise cost. Hint for b): how many ways are there to satisfy the clause C?
+
+3a) For each clause C in S we have:  C is a Horn clause or C is a two-literal clause.
+
+...
+
+3b) All clauses in S are Horn clauses, except for one clause C in S.
+
+...
+
+3c) All clauses in S are Horn clauses, except for two clauses C1 and C2.
+
+...
+
+
+
+------------------------------------------------------------------------------------
+Problem 4. (3 points).                                   @n@nota4:
+MaxSAT is the problem that takes as input a natural number k and a set of propositional clauses S, and
+it asks whether there is any interpretation I satisfying at least k clauses of S.
+
+4a) Do you think that MaxSAT is polynomial? NP-complete? Exponential? Explain very briefly why.
+
+...
+
+4b) How would you use a SAT solver to decide MaxSAT?
+
+...
+
+4c) How would you use a SAT solver to solve the optimization version of MaxSAT, that is,
+how to find the $I$ that satisfies as many of the clauses of $S$ as possible?
+
+...
+
+
+
+=======================================================================
+FIRST-ORDER LOGIC.
+
+
+Problem 5. (3 points).                                   @n@nota5:
+For each one of the following statements, indicate if it is true(T) or false(F) for first-order logic.
+Give no explanations why. Below always F,G,H are formulas and I is an interpretation.
+
+ ...  There are infinitely many different formulas, even if there is only one predicate symbol.
+ ...  Given I and F, it is decidable in linear time whether I |=  F.
+ ...  Given I and F, it is decidable whether I |=  F.
+ ...  Given F, it is decidable in polynomial time whether F is satisfiable.
+ ...  Given F, it is decidable whether F is satisfiable.
+ ...  F |= G iff F & -G is unsatisfiable.
+ ...  F is a tautology  iff  -F is unsatisfiable.
+ ...  Given F and G, it is co-semi-decidable whether  F |= G.
+ ...  Given F and G, it is semi-decidable whether F and G are logically equivalent,
+ ...  We can express with a formula F that all models of F have a domain of size at most 3.
+ ...  Given a formula F and an interpretation I with domain D_I of size 4, it is decidable whether I |=  F.
+
+
+------------------------------------------------------------------------------------
+Problem 6. (3 points).                                   @n@nota6:
+6a) Is the formula  Ax ( -p(x,f(x))  &  -p(f(x),x)  &  ( Ey p(f(x),y)  v  Ez p(z,f(x)) )   )  satisfiable?  Prove it.
+
+...
+
+6b) 
+Let I1 and I2 be first-order interpretations with domains D_I1 = Q (the rationals) and D_I2 = R (the reals).
+In both interpretations, the unary function symbol "square" is interpreted as square_I(x) = x*x. 
+Write a formula F in FOLE (first-order logic with equality), using no other predicate or function symbols
+apart from square, such that F is true in one of the interpretations and false in the other one.
+
+...
+
+
+
+------------------------------------------------------------------------------------
+Problem 7. (4 points).                                   @n@nota7:
+Formalize and prove by resolution that sentence F is a logical consequence of the first five:
+
+A: John eats all kind of food.
+B: If a person eats something that kills, then that person is dead
+C: Everything that does not kill and is eaten by someone is food
+D: Mary is not dead
+E: Mary eats peanuts
+F: John eats peanuts.
+
+Predicates:
+    kills(x) //x kills
+    dead(x) //x is dead
+    eats(x,y) //x eats y
+    food(x) //x is food
+    
+...
+-----------------------------------------------------------------------
+
+
+

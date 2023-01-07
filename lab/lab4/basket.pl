@@ -2,16 +2,17 @@
 % To use this prolog template for other optimization problems, replace the code parts 1,2,3,4 below. %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Extend this Prolog source to design a Basketball League with N
-% teams, with N-1 rounds (playing days), where every two teams play
-% against each other on exactly one round, one team at home and the other team
+% This was the original lab exercise:
+% 
+% This Prolog source designs a Basketball League with N teams, with
+% N-1 rounds (playing days), where every two teams play against each
+% other on exactly one round, one team at home and the other team
 % away, and on each round each team has exactly one match (home or away).
-% Moreover, we say that a team has a "double" on round R if it plays
+% Moreover, we say that a team has a "double" on round R iff it plays
 % at home on rounds R-1 and on round R, or if it plays away on R-1 and on R.
 % No "triples" are allowed: no three consecutive homes, nor three aways.
-% Minimize the number of doubles of the team with the largest number of doubles.
-
-% Additional constraints (see the input example below):
+% The number of doubles of the team with the largest number of doubles is minimized.
+% Also (see the input example below):
 %  1. No doubles on certain rounds
 %  2. Movistar has bought the tv rights for Sunday 8pm for all
 %     matches among a group of teams (the so-called tv Teams) and wants
@@ -19,14 +20,23 @@
 %  3. On certain rounds certain teams cannot play at home.
 
 
+% This was what had to be added for the exam:
+% Now ADD both the following additional constraints for this exam:
+%
+%  
+%  Each team should get approximately half its matches home, that is, N/2 or N/2 - 1, where N is the number of teams.
+% 
+%  The teams 1,2,3,4 are from the same city. On each round, always two of them should play home and two away.
+%
+
 %%%%%%%%%%%%%%%%%%%%% toy input example:
 
 numTeams(14).               % This number is always even.
-noDoubles([2,8,13]).        % No team has a double on any of these rounds.
+noDoubles([3,6,7,12,13]).   % No team has a double on any of these rounds.
 tvTeams([1,2,3,4,5,6]).     % The list of tv teams.
-notHome( 1, [2,5,7,9,10]).  % Team 1 cannot play at home on round 2, also not on round 5, etc.
+notHome( 1, [2,5,7,9]).     % Team 1 cannot play at home on round 2, also not on round 5, etc.
 notHome( 2, [4,6,8,10]).
-notHome( 3, [2,3,5,7,9,10]).
+notHome( 3, [2,5,7,9,12]).
 notHome( 4, [4,6,8,12]).
 notHome( 5, [1,3,12]).
 notHome( 6, [1,3,5,7,10]).
@@ -48,89 +58,101 @@ round(R):- numTeams(N), N1 is N-1, between(1,N1,R).
 tvMatch(S,T):- tvTeams(TV), member(S,TV), member(T,TV), S\=T.
 away(T,R):- notHome(T,L), member(R,L).
 
-%%%%%%% =======================================================================================
 
-% Our LI Prolog template for solving problems using a SAT solver.
-%
-% It generates the SAT clauses, calls the SAT solver, shows the solution and computes its cost.
-% Just specify:
-%       1. SAT Variables
-%       2. Clause generation
-%       3. DisplaySol: show the solution.
-%       4. CostOfThisSolution: computes the cost
-%
-%%%%%%% =======================================================================================
-
-
-symbolicOutput(0).
-
-%%%%%% It is mandatory to use these variables!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.- Declare SAT variables to be used
-satVariable( match(S,T,R) ):- team(S), team(T), round(R).   %  "on round R there is a match S-T at home of S"
-satVariable( home(S,R)    ):- team(S),          round(R).   %  "team S plays at home on round R"
-satVariable( double(S,R)  ):- team(S),          round(R).   %  "team S has a double on round R"
+satVariable(match(S,T,R)):- team(S), team(T), round(R).   %meaning  "on round R there is a match S-T at home of S"
+satVariable(home(S,R)   ):- team(S), round(R).            %meaning  "team S plays at home on round R"
+satVariable(double(S,R) ):- team(S), round(R).            %meaning  "team S has a double on round R"
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2. This predicate writeClauses(MaxCost) generates the clauses that guarantee that
-%    a solution with cost at most MaxCost is found
+% a solution with cost at most MaxCost is found
 
+
+% 1. This predicate writeClauses(MaxCost) generates the clauses for the given MaxCost:
 writeClauses(MaxCost):-
     eachTeamEachRoundExactlyOneMatch,
-    eachOpponentExactlyOnce,
-    noTriples,
+    everyTwoTeamsPlayExactlyOnce,
+    matchImpliesHomeOrNot,
+    relationHomeAndDouble,
     noDoubles,
+    eachRoundTVMatch,
+    notHomes,
+    noTriples,
     maxCost(MaxCost),
+    eachTeamAproxHalfTheRoundsHomeHalfAway,
+    eachRoundTwoHomeTwoAwayOf1234,
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
+eachRoundTwoHomeTwoAwayOf1234:-
+    round(R),
+    findall(home(S,R),(team(S), member(S,[1,2,3,4])), Lits2),
+    exactly(2,Lits2),
+    fail.
+eachRoundTwoHomeTwoAwayOf1234.
+
+% eachRoundTwoHomeTwoAwayOf1234:-
+%     round(R),
+%     exactly(2, [home(1, R), home(2, R), home(3, R), home(4, R)]),fail.
+% eachRoundTwoHomeTwoAwayOf1234.
+
+eachTeamAproxHalfTheRoundsHomeHalfAway:- 
+    team(S),
+    findall(home(S,R),round(R),Lits2),
+    numTeams(N),
+    Naux is N/2,
+    Naux2 is Naux-1,
+    atMost(Naux,Lits2), atLeast(Naux2,Lits2),
+    fail. 
+eachTeamAproxHalfTheRoundsHomeHalfAway.
+
+
+
+%% If you want to train on the original lab exercise, remove the following lines until point 3:
+%%
+%%
+%%
 eachTeamEachRoundExactlyOneMatch:- team(T), round(R),
     findall( match(S,T,R), difTeams(S,T), LitsH ),
     findall( match(T,S,R), difTeams(S,T), LitsA ), append(LitsH,LitsA,Lits), exactly(1,Lits), fail.
 eachTeamEachRoundExactlyOneMatch.
 
-eachOpponentExactlyOnce:- 
-team(S), 
-difTeams(S,T), 
-findall(match(S,T,R), round(R), LitsS), 
-findall(match(T,S,R), round(R), LitsT),
-append(LitsS,LitsT,Lits),
-exactly(1,Lits),
-fail.
-eachOpponentExactlyOnce.
+everyTwoTeamsPlayExactlyOnce:- difTeams(S,T), S>T,
+    findall( match(S,T,R), round(R),      LitsH ),
+    findall( match(T,S,R), round(R),      LitsA ), append(LitsH,LitsA,Lits), exactly(1,Lits), fail.
+everyTwoTeamsPlayExactlyOnce.
 
-homesAndAways :- 
-home(S,R),
-difTeams(S,T),
-round(R),
-writeClause([-match(S,T,R), home(S,R)]),
-writeClause([-match(S,T,R), -home(T,R)]),
-fail.
-homesAndAways.
+matchImpliesHomeOrNot:- difTeams(S,T), round(R),
+    writeClause([ -match(S,T,R),   home(S,R) ]),
+    writeClause([ -match(S,T,R), -home(T,R) ]), fail.
+matchImpliesHomeOrNot.
 
-noDoubles:-
-    round(R),
-    noDoubles(L),
-    member(R,L),
-    team(S),
-    writeClause([-double(S,R)]),
-    fail.
+relationHomeAndDouble:- team(S), round(R1), R2 is R1+1, round(R2),
+    writeClause([  -home(S,R1),  -home(S,R2),    double(S,R2) ]),
+    writeClause([   home(S,R1),   home(S,R2),    double(S,R2) ]),
+    writeClause([  -home(S,R1),   home(S,R2),   -double(S,R2) ]),
+    writeClause([   home(S,R1),  -home(S,R2),   -double(S,R2) ]), fail.
+relationHomeAndDouble.
+
+noDoubles:- noDoubles(L), member(R,L), team(S), writeClause([ -double(S,R) ]), fail.
 noDoubles.
 
-%%% double <-> home ^ home ------ double -> home ^ double -> home ----- -double v home1 ^ -double v home2 ----
+eachRoundTVMatch:- round(R),  findall(match(S,T,R),tvMatch(S,T),Lits),  writeClause(Lits), fail.
+eachRoundTVMatch.
 
-doubles :-
-    round(R),
-    R1 is R-1,
-    round(R1),
-    team(S),
-    writeClause([double(S,R), home(S,R), home(S,R1)]),
-    writeClause([double(S,R), home(S,R), home(S,R1)]),
-doubles.
+notHomes:- away(T,R), writeClause([ -home(T,R) ]), fail.
+notHomes.
 
-
+noTriples:- team(S), round(R1), R1>1, R2 is R1+1, round(R2),
+    writeClause([  -double(S,R1), -double(S,R2) ]), fail.
+noTriples.
+    
 maxCost(infinite):-!.
-maxCost(Max):- team(T), findall(double(T,R), round(R), Lits ), atMost(Max,Lits), fail.
+maxCost(Max):- team(T), findall(double(T,R), (round(R),R>1), Lits ), atMost(Max,Lits), fail.
 maxCost(_).
 
 
@@ -141,9 +163,15 @@ displaySol(M):- round(R), nl,  write('Round '), write2(R), write(':  '),
 		member(match(S,T,R),M),  write('  '), writeMatch(S-T), fail.
 displaySol(M):- nl, team(T), nl, write('Doubles of team '), write2(T), write(':      '),
 		round(R), member(double(T,R),M), write('  '), write2(R), fail.
+displaySol(M):- nl, team(T), nl, findall( R, member(home(T,R),M), L), length(L,N), write(N),
+		write(' home matches of team '), write2(T), write(':      '),
+		round(R), wHome(R,T,M), fail.
 displaySol(M):- nl,nl, write('Tv matches: '), round(R), nl, write('Round '), write2(R), write(':  '),
 		member(match(S,T,R), M ), tvMatch(S,T), write(' '), writeMatch(S-T), fail.
 displaySol(_):- nl, nl, write('======================================================================'), nl,nl,nl,!.
+
+wHome(R,T,M):- member(home(T,R),M), write('  h'), write2(R),!.
+wHome(R,_,_):-                     write('   '), write2(R),!.
 
 writeMatch(S-T):- write2(S), write('-'), write2(T), !.
 write2(R):- R<10,!,write('0'),write(R),!.
@@ -152,14 +180,14 @@ write2(R):- write(R),!.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4. This predicate computes the cost of a given solution M:
 %
-costOfThisSolution(M,Cost):- between(0,20,I), Cost is 20-I, team(T), findall(R,member(double(T,R),M),L), length(L,Cost), !.
+costOfThisSolution(M,Cost):- findall(N,(team(T),numberDoubles(T,M,N)), L), max_list(L,Cost),!.
 
-
+numberDoubles(T,M,N):- findall( R, member(double(T,R),M), L), length(L,N), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% No need to modify anything below this line:
-
+% No need to modify anything beow this line:
+symbolicOutput(0).
 main:-  symbolicOutput(1), !, writeClauses(infinite), halt.   % print the clauses in symbolic form and halt
 main:-
     told, write('Looking for initial solution with arbitrary cost...'), nl,
@@ -175,10 +203,10 @@ main:-
 
 treatResult(20,[]       ):- write('No solution exists.'), nl, halt.
 treatResult(20,BestModel):-
-    nl,costOfThisSolution(BestModel,Cost), write('Unsatisfiable. So the optimal solution was this one with cost '),
-    write(Cost), write(':'), nl, displaySol(BestModel), nl,nl,halt.
+    costOfThisSolution(BestModel,Cost), write('Unsatisfiable. So the optimal solution was the previous one with cost '),
+    write(Cost), write('.'), nl,nl,halt.
 treatResult(10,_):- %   shell('cat model',_),
-    nl,write('Solution found '), flush_output,
+    write('Solution found '), flush_output,
     see(model), symbolicModel(M), seen,
     costOfThisSolution(M,Cost),
     write('with cost '), write(Cost), nl,nl,
@@ -232,8 +260,10 @@ readWord(115,W):- repeat, get_code(Ch), member(Ch,[-1,10]), !, get_code(Ch1), re
 readWord(-1,_):-!, fail. %end of file
 readWord(C,[]):- member(C,[10,32]), !. % newline or white space marks end of word
 readWord(Char,[Char|W]):- get_code(Char1), readWord(Char1,W), !.
-:-dynamic(varNumber / 3).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Everything below is given as a standard library, reusable for solving 
+%    with SAT many different problems.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Express that Var is equivalent to the disjunction of Lits:
