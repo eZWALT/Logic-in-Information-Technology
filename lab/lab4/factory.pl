@@ -13,16 +13,20 @@
 %% have 168 hours (numbered from 1 to 168) for all tasks, but we want to
 %% finish all tasks as soon as possible.
 
+%
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%% Input. %%%%%%%  
 
 maxHour(168).
 
 %% format:
-%% task( taskID, Duration, ListOFResourcesUsed ).
-%% resourceUnits( resourceID, NumUnitsAvailable ).
- :-include(easy152).       % simple input example file. 
+%% task( taskID, Duration, ListOFResourcesUsed ). LLISTA DE RECURSOS FETS SERVIR (SEMPRE N'HI HAN COM A MAX NumUnitsAviable)
+%% resourceUnits( resourceID, NumUnitsAvailable ). 
+%:-include(easy152).       % simple input example file. 
 %:-include(hardMaybe97).   % for this example there is a solution of cost 97.  We think it is optimal.
-%:-include(hardMaybe147).  % for this example there is a solution of cost 147. We think it is optimal.
+:-include(hardMaybe147).  % for this example there is a solution of cost 147. We think it is optimal.
 
 %%%%%% Some helpful definitions to make the code cleaner:
 
@@ -37,6 +41,8 @@ symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.- Declare SAT variables to be used
 satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"     (MANDATORY)
+satVariable( isActive(T,H) ):- task(T), integer(H).   % "task T is active at hour H"     (MANDATORY)
+
 % more variables will be needed....
 
 
@@ -47,9 +53,38 @@ satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"  
 writeClauses(infinite):- !, maxHour(M), writeClauses(M),!.
 writeClauses(MaxHours):-
     eachTaskStartsOnce(MaxHours),
-    ...
+    relateStartToUtilization(MaxHours),
+    atMostKResourcesinHour(MaxHours),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
+
+%%HD IS LIKE THE MAX H WHERE THE TASK COULD POSSIBLY START.
+eachTaskStartsOnce(MaxHours):- 
+    task(T),
+    duration(T,D), 
+    HD is MaxHours - D + 1,
+    findall(start(T,H), between(1,HD,H),Lits),
+    exactly(1,Lits),
+    fail.
+eachTaskStartsOnce(_).
+
+relateStartToUtilization(MaxHours):-
+    task(T),
+    between(1,MaxHours,H),
+    duration(T,D),
+    between(0,D,I),
+    Ix is H + I,
+    writeClause([-start(T,H), isActive(T,Ix)]),
+    fail.
+relateStartToUtilization(_).
+
+atMostKResourcesinHour(MaxHours):-
+    between(1,MaxHours,H),
+    resourceUnits(R,Units),
+    findall(isActive(T,H), usesResource(T,R),Lits), 
+    atMost(Units,Lits),
+    fail.
+atMostKResourcesinHour(_).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

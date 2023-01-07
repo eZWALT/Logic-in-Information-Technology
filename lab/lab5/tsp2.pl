@@ -8,12 +8,16 @@
 % Can you solve the problem for all 22 cities?
 
 main:- statistics(walltime,_),
-       N=12,  %try higher numbers here...
+       numCities(N),  %try higher numbers here...
        retractall(bestRouteSoFar(_,_)),  assertz(bestRouteSoFar(100000,[])),  % "infinite" distance
-       findall(I,between(2,N,I),Cities), tsp( Cities, 0, [1] ).
+       findall(I,between(2,N,I),Cities),retractall(nearestCities(_, _)), minscities,
+	   retractall(absMin(_)), absoluteMinimum(Cities), tsp( Cities, 0, [1] ).
+
 main:- bestRouteSoFar(Km,ReverseRoute), reverse( ReverseRoute, Route ), nl,
        write('Optimal route: '), write(Route), write('. '), write(Km), write(' km.'), nl, nl,
        statistics(walltime,[MS|_]), S is MS/1000, write(S), write(' seconds.'), nl, halt.
+
+numCities(15).
 
 % tsp( Cities, AccumulatedKm, RouteSoFar )
 %1
@@ -23,9 +27,6 @@ tsp( [], AccumulatedKm, RouteSoFar ):- storeRouteIfBetter(AccumulatedKm,RouteSoF
 tsp(  _, AccumulatedKm, _          ):- bestRouteSoFar(Km,_), AccumulatedKm >= Km, !, fail.
 %alternative:
 
-lowerBoundOfRemainingCities([],0).
-lowerBoundOfRemainingCities([City| Rest], LBound)
-
 tsp( Cities, AccumulatedKm, _ ):- 
 	bestRouteSoFar(Km,_),
    lowerBoundOfRemainingCities( Cities, LBound ),   %implement this (efficiently)!
@@ -34,7 +35,7 @@ tsp( Cities, AccumulatedKm, _ ):-
 %3
 tsp( Cities, AccumulatedKm, [ CurrentCity | RouteSoFar ] ):-
     select( City, Cities, RemainingCities ),  % select next city to visit
-%   myselect( CurrentCity, City, Cities, RemainingCities ),  % implement this
+    %myselect( CurrentCity, City, Cities, RemainingCities ),  % implement this
     distance( CurrentCity, City, Km ),  AccumulatedKm1 is AccumulatedKm+Km,
     tsp( RemainingCities, AccumulatedKm1, [ City, CurrentCity | RouteSoFar ] ).
 
@@ -44,10 +45,38 @@ storeRouteIfBetter( Km, Route ):-  bestRouteSoFar( BestKm, _ ), Km < BestKm,
     retractall(bestRouteSoFar(_,_)), assertz(bestRouteSoFar(Km,Route)),  %this asserts or retracts info from the database.
     !.
 
+%%mis funciones
+absoluteMinimum(Cities) :- citiesMinDist(Cities, C), min_list(C, K), assertz(absoluteMin(K)). 
 
-%  Number of points N is   22
-distance(A,B,Km):-
-    M= [[   0,144,114,105, 31,109,135,132, 85, 79,158, 20, 73,162,127,190,156, 58, 87, 71,154, 55],
+citiesMinDist([], []).
+citiesMinDist([City|Cities], [Min|Mins]):- nearestCities(City, K), Min is K, citiesMinDist(Cities, Mins).
+
+lowerBoundOfRemainingCities([],0).
+lowerBoundOfRemainingCities(Cities, LBound):-
+	absMin(K),
+	length(Cities,L),
+	LBound is L*K.
+
+%%CITY IS THE NEXT CITY TO VISIT, CITIES ARE ALL THE CITIES AND REMAINING CITIES ARE [CITY | REMANININGCITY] = CITIES
+myselect(CurrentCity, City, Cities, RemainingCities):-
+	length(Cities, NCities),
+	numCities(TotalCities),
+	Nivel is TotalCities-NCities,
+	Nivel =< 2,
+
+	nearestCities(CurrentCity, K),
+	distance(CurrentCity,City,K),
+	member(City,Cities),
+	select(City, Cities,RemainingCities). 
+
+myselect(_, NextCity, Cities, RemainingCities):-
+	select(NextCity, Cities, RemainingCities).
+
+minscities :- matriu(M), nth1(N, M, ROW), Z is 0, select(Z,ROW, Row), min_list(Row, K), assertz(nearestCities(N, K)), fail.
+minscities.
+
+matriu([
+	[  0,144,114,105, 31,109,135,132, 85, 79,158, 20, 73,162,127,190,156, 58, 87, 71,154, 55],
 	[ 144,  0,144,181,147, 76,195, 73, 64,114,220,135, 71, 18, 39, 60, 37,101, 62,146,205,153],
 	[ 114,144,  0, 49, 86,169, 51, 78,130, 42, 76, 94,114,154,105,151,125,137, 94, 46, 61, 66],
 	[ 105,181, 49,  0, 73,189, 31,124,152, 67, 52, 88,135,195,146,197,169,147,123, 40, 51, 49],
@@ -68,6 +97,11 @@ distance(A,B,Km):-
 	[  87, 62, 94,123, 85, 77,141, 55, 39, 57,167, 75, 28, 79, 40,102, 68, 63,  0, 85,154, 91],
 	[  71,146, 46, 40, 40,148, 67, 98,112, 33, 91, 52, 95,161,113,170,139,106, 85,  0, 85, 20],
 	[ 154,205, 61, 51,123,227, 19,136,189, 99, 19,137,172,214,166,206,183,190,154, 85,  0, 98],
-	[  55,153, 66, 49, 24,146, 79,113,111, 48,102, 39, 95,169,124,183,151,100, 91, 20, 98,  0]],
+	[  55,153, 66, 49, 24,146, 79,113,111, 48,102, 39, 95,169,124,183,151,100, 91, 20, 98,  0]]).
+
+%  Number of points N is   22
+distance(A,B,Km):-
+	matriu(M),
     nth1(A,M,Row), nth1(B,Row,Km),!.
+
 
